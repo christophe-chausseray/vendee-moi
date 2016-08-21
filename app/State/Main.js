@@ -29,7 +29,6 @@ var Main = (function (_super) {
         this.gameState.creatures.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Female, 17 * 12));
         this.gameState.creatures.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Male, 21 * 12));
         this.gameState.creatures.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Female, 14 * 12));
-        this.game.time.events.repeat(Phaser.Timer.SECOND * 100, 1000, this.randomEat, this);
     };
     Main.prototype.update = function () {
         this.displayHumans(this.gameState.creatures);
@@ -82,8 +81,8 @@ var Main = (function (_super) {
         var humanMenu = new Human_3.HumanMenu(human);
         this.openMenu(humanMenu);
         humanMenu.wantToEat.attach(function (human) {
-            this.openEatMenu(human);
             this.closeMenu(humanMenu);
+            this.openEatMenu(human);
         }.bind(this));
         humanMenu.wantToFuck.attach(function (human) {
             this.closeMenu(humanMenu);
@@ -91,6 +90,13 @@ var Main = (function (_super) {
         }.bind(this));
     };
     Main.prototype.openEatMenu = function (human) {
+        var fuckMenu = new Fuck_1.FuckMenu(human, this.gameState.creatures);
+        this.openMenu(fuckMenu);
+        fuckMenu.wantToFuck.attach(function (event) {
+            event.fucker.eat(event.fucked);
+            event.fucked.setHealth(0);
+            this.closeMenu(fuckMenu);
+        }.bind(this));
     };
     Main.prototype.openFuckMenu = function (human) {
         var fuckMenu = new Fuck_1.FuckMenu(human, this.gameState.creatures);

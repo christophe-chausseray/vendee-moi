@@ -37,8 +37,6 @@ export class Main extends Phaser.State {
     this.gameState.creatures.push(humanFactory.create(null, null, Gender.Female, 17 * 12))
     this.gameState.creatures.push(humanFactory.create(null, null, Gender.Male, 21 * 12))
     this.gameState.creatures.push(humanFactory.create(null, null, Gender.Female, 14 * 12))
-
-    this.game.time.events.repeat(Phaser.Timer.SECOND * 100, 1000, this.randomEat, this);
   }
 
   update() {
@@ -79,7 +77,6 @@ export class Main extends Phaser.State {
 
     for (let human of humans) {
       if (undefined === this.humanSprites[count]) {
-
         var humanSprite = new HumanSprite(this.game, 0, 0, human, count + 1);
         humanSprite.position.set(0, count * (humanSprite.height * 4 + 10) + 40);
         humanSprite.events.onInputDown.add(function (humanSprite) {
@@ -102,8 +99,8 @@ export class Main extends Phaser.State {
     this.openMenu(humanMenu);
 
     humanMenu.wantToEat.attach(function (human: Human) {
-      this.openEatMenu(human);
       this.closeMenu(humanMenu);
+      this.openEatMenu(human);
     }.bind(this));
     humanMenu.wantToFuck.attach(function (human: Human) {
       this.closeMenu(humanMenu);
@@ -112,7 +109,14 @@ export class Main extends Phaser.State {
   }
 
   openEatMenu(human: Human) {
+    let fuckMenu = new FuckMenu(human, this.gameState.creatures);
+    this.openMenu(fuckMenu);
 
+    fuckMenu.wantToFuck.attach(function (event) {
+      event.fucker.eat(event.fucked);
+      event.fucked.setHealth(0);
+      this.closeMenu(fuckMenu);
+    }.bind(this));
   }
 
   openFuckMenu(human: Human) {

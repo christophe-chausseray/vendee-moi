@@ -83,11 +83,11 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
   }
 
   nutritionalValue(): number {
-    return 60 + (this.health / 2) - this.age;
+    return 60 + (this.health / 2) - this.age / 12;
   }
 
   eat(food: FoodInterface) {
-    this.setHealth(food.nutritionalValue());
+    this.setHealth(this.getHealth() + food.nutritionalValue());
   }
 
   ages(month: number) {

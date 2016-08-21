@@ -53,10 +53,10 @@ var Human = (function () {
         return this.gender;
     };
     Human.prototype.nutritionalValue = function () {
-        return 60 + (this.health / 2) - this.age;
+        return 60 + (this.health / 2) - this.age / 12;
     };
     Human.prototype.eat = function (food) {
-        this.setHealth(food.nutritionalValue());
+        this.setHealth(this.getHealth() + food.nutritionalValue());
     };
     Human.prototype.ages = function (month) {
         this.age += month;
