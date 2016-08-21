@@ -3,3 +3,9 @@ npm-debug.log
 typings
 *.sublime-project
 *.sublime-workspace
+app/*.js
+app/*.js.map
+app/*/*.js.map
+app/*/*.js
+app/*/*/*.js.map
+app/*/*/*.js

@@ -3,7 +3,17 @@
     <base href="/">
     <title>Core board</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable = no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+      WebFont.load({
+        google: {
+          families: ['Press Start 2P']
+        }
+      });
+    </script>
     <!-- 1. Load libraries -->
      <!-- Polyfill(s) for older browsers -->
     <script src="node_modules/phaser/build/phaser.min.js"></script>
@@ -16,9 +26,11 @@
     <script>
       System.import('app').catch(function(err){ console.error(err); });
     </script>
+    <link rel="stylesheet" type="text/css" href="app/style/style.css">
   </head>
   <!-- 3. Display the application -->
   <body>
     <div id="game-content"></div>
+    <div id="menu"></div>
   </body>
 </html>

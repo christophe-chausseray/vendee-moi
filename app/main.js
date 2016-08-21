@@ -1,4 +1,6 @@
 /// <reference path="../node_modules/phaser/typescript/phaser.d.ts" />
+/// <reference path="../node_modules/phaser/typescript/pixi.d.ts" />
+/// <reference path="../typings/modules/lodash/index.d.ts"/>
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -12,7 +14,7 @@ var Main_1 = require('./State/Main');
 var Game = (function (_super) {
     __extends(Game, _super);
     function Game() {
-        _super.call(this, 640, 480, Phaser.AUTO, 'game-div');
+        _super.call(this, 640, 1136, Phaser.AUTO, 'game-div', null, false, false);
         this.state.add('boot', Boot_1.Boot);
         this.state.add('preload', Preload_1.Preload);
         this.state.add('menu', Menu_1.Menu);
@@ -22,4 +24,6 @@ var Game = (function (_super) {
     return Game;
 }(Phaser.Game));
 var game = new Game();
+Phaser.Canvas.setImageRenderingCrisp(game.canvas); //for Canvas, modern approach
+Phaser.Canvas.setSmoothingEnabled(game.context, false); //also for Canvas, legacy approach
 //# sourceMappingURL=main.js.map

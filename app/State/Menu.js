@@ -11,7 +11,8 @@ var Menu = (function (_super) {
     }
     Menu.prototype.create = function () {
         var _this = this;
-        this.background = this.add.sprite(80, 0, 'menu-background');
+        this.background = this.add.sprite(this.game.width / 2, this.game.height / 2, 'menu-background');
+        this.background.anchor.set(0.5);
         this.input.onDown.addOnce(function () {
             _this.game.state.start('main');
         });
