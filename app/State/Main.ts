@@ -6,7 +6,7 @@ import { Male } from '../Model/Human/Male';
 import { HumanSprite } from '../Sprite/Human';
 
 import { HumanMenu } from '../Menu/Human';
-import { FuckMenu } from '../Menu/Fuck';
+import { HumanSelectorMenu } from '../Menu/Select';
 
 import { BirthGiverInterface } from '../Model/BirthGiverInterface';
 
@@ -30,11 +30,12 @@ export class Main extends Phaser.State {
   moneySound: Phaser.Sound;
   amountSprite: Phaser.Text;
   shopSprite: Phaser.Image;
+  humansGroup: Phaser.Group;
   moneyEmitter;
 
   create() {
     this.stage.backgroundColor = 0x000000;
-    this.game.world.resize(this.game.world.width, 2000);
+    // this.game.world.resize(this.game.world.width, this.game.height + 200);
 
     var floor: Phaser.TileSprite = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'floor');
     this.amountSprite = this.game.add.text(this.game.world.centerX, 70, '', {
@@ -63,6 +64,8 @@ export class Main extends Phaser.State {
 
     this.monthElapsedTimer = this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 3000000, this.monthElapsed, this);
 
+    this.humansGroup = this.game.add.group();
+
     this.gameState = new GameState();
     this.gameState.humans.push(humanFactory.create(null, null, Gender.Female, 17 * 12));
     this.gameState.humans.push(humanFactory.create(null, null, Gender.Male, 21 * 12));
@@ -82,13 +85,23 @@ export class Main extends Phaser.State {
     } else {
       origDragPoint = null;
     }
+
+    var count = 0;
+    this.humansGroup.forEach(function (sprite) {
+      sprite.position.set(10, count * (sprite.height * 4) + 140);
+      count++;
+    }, this);
+
+    if (this.humansGroup.height + this.humansGroup.position.x + 400 > this.game.height) {
+      this.game.world.resize(this.game.width, this.humansGroup.height + this.humansGroup.position.x + 400);
+    }
   }
 
   monthElapsed(): void {
     const money = this.gameState.money;
-    life.update(this.gameState, this.gameState.humans);
-    maternity.update(this.gameState, this.gameState.humans);
-    capitalism.update(this.gameState, this.gameState.humans);
+    life.update(this.gameState);
+    maternity.update(this.gameState);
+    capitalism.update(this.gameState);
 
     if (money !== this.gameState.money) {
       this.moneyEmitter.start(false, 2000, 10, 5);
@@ -106,27 +119,19 @@ export class Main extends Phaser.State {
   }
 
   displayHumans(humans: Human[]) {
-    var count = 0;
-    var humansGroup = this.game.make.group();
-
     for (let human of humans) {
-      if (undefined === this.humanSprites[count]) {
-        var humanSprite = new HumanSprite(this.game, 0, 0, human, count + 1);
-        humanSprite.position.set(10, count * (humanSprite.height * 5 + 10) + 140);
+      if (undefined === this.humanSprites[human.getId()]) {
+        var humanSprite = new HumanSprite(this.game, 0, 0, human);
         humanSprite.scale.set(1.3);
         humanSprite.events.onInputDown.add(function (humanSprite) {
            this.openHumanDetails(humanSprite.getHuman());
         }.bind(this));
-        humansGroup.add(humanSprite);
-        this.humanSprites[count] = humanSprite;
+        this.humanSprites[human.getId()] = humanSprite;
+        this.humansGroup.add(humanSprite);
       }
 
-      this.humanSprites[count].update();
-
-      count++;
+      this.humanSprites[human.getId()].update();
     }
-
-    this.game.add.existing(humansGroup);
   }
 
   openHumanDetails(human) {
@@ -145,26 +150,32 @@ export class Main extends Phaser.State {
       human.work(new ProstituteActivity());
       this.closeMenu(humanMenu);
     }.bind(this));
+    humanMenu.wantToCancel.attach(function (human: Human) {
+      this.closeMenu(humanMenu);
+    }.bind(this));
   }
 
   openEatMenu(human: Human) {
-    let fuckMenu = new FuckMenu(human, this.gameState.humans);
-    this.openMenu(fuckMenu);
+    let humanSelectorMenu = new HumanSelectorMenu(human, this.gameState.humans);
+    this.openMenu(humanSelectorMenu);
 
-    fuckMenu.wantToFuck.attach(function (event) {
-      event.fucker.eat(event.fucked);
-      event.fucked.setHealth(0);
-      this.closeMenu(fuckMenu);
+    humanSelectorMenu.selected.attach(function (event) {
+      event.human.eat(event.selected);
+      event.selected.setHealth(0);
+      this.gameState.humans.splice(this.gameState.humans.indexOf(event.selected), 1);
+      this.humansGroup.remove(this.humanSprites[event.selected.getId()]);
+      this.humanSprites.splice(event.selected.getId(), 1);
+      this.closeMenu(humanSelectorMenu);
     }.bind(this));
   }
 
   openFuckMenu(human: Human) {
-    let fuckMenu = new FuckMenu(human, this.gameState.humans);
-    this.openMenu(fuckMenu);
+    let humanSelectorMenu = new HumanSelectorMenu(human, this.gameState.humans);
+    this.openMenu(humanSelectorMenu);
 
-    fuckMenu.wantToFuck.attach(function (event) {
-      bed.fuck(event.fucker, event.fucked);
-      this.closeMenu(fuckMenu);
+    humanSelectorMenu.selected.attach(function (event) {
+      bed.fuck(event.human, event.selected);
+      this.closeMenu(humanSelectorMenu);
     }.bind(this));
   }
 

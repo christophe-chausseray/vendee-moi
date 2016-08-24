@@ -7,7 +7,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Human_1 = require('../Model/Human/Human');
 var Human_2 = require('../Sprite/Human');
 var Human_3 = require('../Menu/Human');
-var Fuck_1 = require('../Menu/Fuck');
+var Select_1 = require('../Menu/Select');
 var Bed_1 = require('../Service/Bed');
 var HumanFactory_1 = require('../Service/HumanFactory');
 var Maternity_1 = require('../Service/GameUpdater/Maternity');
@@ -24,7 +24,7 @@ var Main = (function (_super) {
     }
     Main.prototype.create = function () {
         this.stage.backgroundColor = 0x000000;
-        this.game.world.resize(this.game.world.width, 2000);
+        // this.game.world.resize(this.game.world.width, this.game.height + 200);
         var floor = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'floor');
         this.amountSprite = this.game.add.text(this.game.world.centerX, 70, '', {
             font: '30px Press Start 2P',
@@ -47,6 +47,7 @@ var Main = (function (_super) {
         this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
         floor.scale['setTo'](4, 4);
         this.monthElapsedTimer = this.game.time.events.repeat(Phaser.Timer.SECOND * 2, 3000000, this.monthElapsed, this);
+        this.humansGroup = this.game.add.group();
         this.gameState = new Game_1.GameState();
         this.gameState.humans.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Female, 17 * 12));
         this.gameState.humans.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Male, 21 * 12));
@@ -64,12 +65,20 @@ var Main = (function (_super) {
         else {
             origDragPoint = null;
         }
+        var count = 0;
+        this.humansGroup.forEach(function (sprite) {
+            sprite.position.set(10, count * (sprite.height * 4) + 140);
+            count++;
+        }, this);
+        if (this.humansGroup.height + this.humansGroup.position.x + 400 > this.game.height) {
+            this.game.world.resize(this.game.width, this.humansGroup.height + this.humansGroup.position.x + 400);
+        }
     };
     Main.prototype.monthElapsed = function () {
         var money = this.gameState.money;
-        Life_1.life.update(this.gameState, this.gameState.humans);
-        Maternity_1.maternity.update(this.gameState, this.gameState.humans);
-        Capitalism_1.capitalism.update(this.gameState, this.gameState.humans);
+        Life_1.life.update(this.gameState);
+        Maternity_1.maternity.update(this.gameState);
+        Capitalism_1.capitalism.update(this.gameState);
         if (money !== this.gameState.money) {
             this.moneyEmitter.start(false, 2000, 10, 5);
             this.moneySound.play();
@@ -83,24 +92,19 @@ var Main = (function (_super) {
         }
     };
     Main.prototype.displayHumans = function (humans) {
-        var count = 0;
-        var humansGroup = this.game.make.group();
         for (var _i = 0, humans_1 = humans; _i < humans_1.length; _i++) {
             var human = humans_1[_i];
-            if (undefined === this.humanSprites[count]) {
-                var humanSprite = new Human_2.HumanSprite(this.game, 0, 0, human, count + 1);
-                humanSprite.position.set(10, count * (humanSprite.height * 5 + 10) + 140);
+            if (undefined === this.humanSprites[human.getId()]) {
+                var humanSprite = new Human_2.HumanSprite(this.game, 0, 0, human);
                 humanSprite.scale.set(1.3);
                 humanSprite.events.onInputDown.add(function (humanSprite) {
                     this.openHumanDetails(humanSprite.getHuman());
                 }.bind(this));
-                humansGroup.add(humanSprite);
-                this.humanSprites[count] = humanSprite;
+                this.humanSprites[human.getId()] = humanSprite;
+                this.humansGroup.add(humanSprite);
             }
-            this.humanSprites[count].update();
-            count++;
+            this.humanSprites[human.getId()].update();
         }
-        this.game.add.existing(humansGroup);
     };
     Main.prototype.openHumanDetails = function (human) {
         var humanMenu = new Human_3.HumanMenu(human);
@@ -117,22 +121,28 @@ var Main = (function (_super) {
             human.work(new Prostitute_1.ProstituteActivity());
             this.closeMenu(humanMenu);
         }.bind(this));
+        humanMenu.wantToCancel.attach(function (human) {
+            this.closeMenu(humanMenu);
+        }.bind(this));
     };
     Main.prototype.openEatMenu = function (human) {
-        var fuckMenu = new Fuck_1.FuckMenu(human, this.gameState.humans);
-        this.openMenu(fuckMenu);
-        fuckMenu.wantToFuck.attach(function (event) {
-            event.fucker.eat(event.fucked);
-            event.fucked.setHealth(0);
-            this.closeMenu(fuckMenu);
+        var humanSelectorMenu = new Select_1.HumanSelectorMenu(human, this.gameState.humans);
+        this.openMenu(humanSelectorMenu);
+        humanSelectorMenu.selected.attach(function (event) {
+            event.human.eat(event.selected);
+            event.selected.setHealth(0);
+            this.gameState.humans.splice(this.gameState.humans.indexOf(event.selected), 1);
+            this.humansGroup.remove(this.humanSprites[event.selected.getId()]);
+            this.humanSprites.splice(event.selected.getId(), 1);
+            this.closeMenu(humanSelectorMenu);
         }.bind(this));
     };
     Main.prototype.openFuckMenu = function (human) {
-        var fuckMenu = new Fuck_1.FuckMenu(human, this.gameState.humans);
-        this.openMenu(fuckMenu);
-        fuckMenu.wantToFuck.attach(function (event) {
-            Bed_1.bed.fuck(event.fucker, event.fucked);
-            this.closeMenu(fuckMenu);
+        var humanSelectorMenu = new Select_1.HumanSelectorMenu(human, this.gameState.humans);
+        this.openMenu(humanSelectorMenu);
+        humanSelectorMenu.selected.attach(function (event) {
+            Bed_1.bed.fuck(event.human, event.selected);
+            this.closeMenu(humanSelectorMenu);
         }.bind(this));
     };
     Main.prototype.openMenu = function (menu) {

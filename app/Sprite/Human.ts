@@ -19,7 +19,7 @@ export class HumanSprite extends Phaser.Sprite {
   private workSprite: Phaser.TileSprite;
   private human: Human;
 
-  constructor(game: Phaser.Game, x: number, y: number, human: Human, identifier: number) {
+  constructor(game: Phaser.Game, x: number, y: number, human: Human) {
     super(game, x, y);
     this.human = human;
     this.inputEnabled = true;
@@ -29,7 +29,7 @@ export class HumanSprite extends Phaser.Sprite {
     var gender = Gender.Female === human.getGender() ? 'female' : 'male';
 
     const isTeen: boolean = this.human.getAge() <= 12 * 13;
-    this.humanSprite = game.make.image(isTeen ? 0 : -10, isTeen ? 30 : 0, gender + '_' + identifier);
+    this.humanSprite = game.make.image(isTeen ? 0 : -10, isTeen ? 30 : 0, gender + '_' + (human.getId() + 1));
     this.humanSprite.scale.set(isTeen ? 0.4 : 0.5);
 
     this.nameSprite = game.make.text(
