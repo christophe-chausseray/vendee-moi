@@ -8,11 +8,13 @@ var Human_1 = require('../Model/Human/Human');
 var Human_2 = require('../Sprite/Human');
 var Human_3 = require('../Menu/Human');
 var Select_1 = require('../Menu/Select');
+var Shop_1 = require('../Menu/Shop');
 var Bed_1 = require('../Service/Bed');
 var HumanFactory_1 = require('../Service/HumanFactory');
 var Maternity_1 = require('../Service/GameUpdater/Maternity');
 var Life_1 = require('../Service/GameUpdater/Life');
 var Capitalism_1 = require('../Service/GameUpdater/Capitalism');
+var Morgue_1 = require('../Service/GameUpdater/Morgue');
 var Prostitute_1 = require('../Model/Activity/Prostitute');
 var Game_1 = require('./Game');
 var origDragPoint = null;
@@ -24,7 +26,6 @@ var Main = (function (_super) {
     }
     Main.prototype.create = function () {
         this.stage.backgroundColor = 0x000000;
-        // this.game.world.resize(this.game.world.width, this.game.height + 200);
         var floor = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'floor');
         this.amountSprite = this.game.add.text(this.game.world.centerX, 70, '', {
             font: '30px Press Start 2P',
@@ -35,6 +36,10 @@ var Main = (function (_super) {
         this.shopSprite.animations.add('fly');
         this.shopSprite.scale.set(0.3);
         this.shopSprite.animations.play('fly', 8, true);
+        this.shopSprite.inputEnabled = true;
+        this.shopSprite.events.onInputDown.add(function () {
+            this.openShop();
+        }.bind(this));
         this.moneyEmitter = this.game.add.emitter(this.game.world.centerX, 70, 5);
         this.moneyEmitter.makeParticles('beer');
         this.moneyEmitter.gravity = -200;
@@ -67,6 +72,10 @@ var Main = (function (_super) {
         }
         var count = 0;
         this.humansGroup.forEach(function (sprite) {
+            if (-1 === this.gameState.humans.indexOf(sprite.human)) {
+                this.humansGroup.remove(sprite);
+                this.humanSprites.splice(sprite.human, 1);
+            }
             sprite.position.set(10, count * (sprite.height * 4) + 140);
             count++;
         }, this);
@@ -79,17 +88,12 @@ var Main = (function (_super) {
         Life_1.life.update(this.gameState);
         Maternity_1.maternity.update(this.gameState);
         Capitalism_1.capitalism.update(this.gameState);
+        Morgue_1.morgue.update(this.gameState);
         if (money !== this.gameState.money) {
             this.moneyEmitter.start(false, 2000, 10, 5);
             this.moneySound.play();
         }
         this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
-    };
-    Main.prototype.destroyHuman = function (human) {
-        var index = this.gameState.humans.indexOf(human, 0);
-        if (index > -1) {
-            this.gameState.humans.splice(index, 1);
-        }
     };
     Main.prototype.displayHumans = function (humans) {
         for (var _i = 0, humans_1 = humans; _i < humans_1.length; _i++) {
@@ -131,9 +135,6 @@ var Main = (function (_super) {
         humanSelectorMenu.selected.attach(function (event) {
             event.human.eat(event.selected);
             event.selected.setHealth(0);
-            this.gameState.humans.splice(this.gameState.humans.indexOf(event.selected), 1);
-            this.humansGroup.remove(this.humanSprites[event.selected.getId()]);
-            this.humanSprites.splice(event.selected.getId(), 1);
             this.closeMenu(humanSelectorMenu);
         }.bind(this));
     };
@@ -143,6 +144,13 @@ var Main = (function (_super) {
         humanSelectorMenu.selected.attach(function (event) {
             Bed_1.bed.fuck(event.human, event.selected);
             this.closeMenu(humanSelectorMenu);
+        }.bind(this));
+    };
+    Main.prototype.openShop = function () {
+        var shop = new Shop_1.Shop(this.gameState.money);
+        this.openMenu(shop);
+        shop.selected.attach(function (event) {
+            this.closeMenu(shop);
         }.bind(this));
     };
     Main.prototype.openMenu = function (menu) {

@@ -12,14 +12,14 @@ export class HumanSelectorMenu extends View {
   public template = _.template(`
     <ul>
       <% _.each(humans, function (human) { %>
-        <li data-id="<%- human.getId() %>"><%- human.getName() %></li>
+        <li data-id="<%- human.getId() %>" style="background-image: url('<%- url %>');">
+          <span><%- human.getName() %></span>
+        </li>
       <% }) %>
-      <li>The dog</li>
-      <li>Pipou</li>
     </ul>
   `);
   public selected: SyncEvent<any> = new SyncEvent<any>();
-  public className: string = 'fuck-menu animated bounceIn';
+  public className: string = 'select-menu animated bounceIn';
 
   constructor(human: Human, humans: Human[]) {
     super();

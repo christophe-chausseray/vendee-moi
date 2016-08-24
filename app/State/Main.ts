@@ -7,6 +7,7 @@ import { HumanSprite } from '../Sprite/Human';
 
 import { HumanMenu } from '../Menu/Human';
 import { HumanSelectorMenu } from '../Menu/Select';
+import { Shop } from '../Menu/Shop';
 
 import { BirthGiverInterface } from '../Model/BirthGiverInterface';
 
@@ -15,6 +16,7 @@ import { humanFactory } from '../Service/HumanFactory'
 import { maternity } from '../Service/GameUpdater/Maternity'
 import { life } from '../Service/GameUpdater/Life'
 import { capitalism } from '../Service/GameUpdater/Capitalism'
+import { morgue } from '../Service/GameUpdater/Morgue'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute';
 
@@ -35,7 +37,6 @@ export class Main extends Phaser.State {
 
   create() {
     this.stage.backgroundColor = 0x000000;
-    // this.game.world.resize(this.game.world.width, this.game.height + 200);
 
     var floor: Phaser.TileSprite = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'floor');
     this.amountSprite = this.game.add.text(this.game.world.centerX, 70, '', {
@@ -47,6 +48,10 @@ export class Main extends Phaser.State {
     this.shopSprite.animations.add('fly');
     this.shopSprite.scale.set(0.3);
     this.shopSprite.animations.play('fly', 8, true);
+    this.shopSprite.inputEnabled = true;
+    this.shopSprite.events.onInputDown.add(function () {
+       this.openShop();
+    }.bind(this));
 
     this.moneyEmitter = this.game.add.emitter(this.game.world.centerX, 70, 5);
     this.moneyEmitter.makeParticles('beer');
@@ -88,6 +93,11 @@ export class Main extends Phaser.State {
 
     var count = 0;
     this.humansGroup.forEach(function (sprite) {
+      if (-1 === this.gameState.humans.indexOf(sprite.human)) {
+        this.humansGroup.remove(sprite);
+        this.humanSprites.splice(sprite.human, 1);
+      }
+
       sprite.position.set(10, count * (sprite.height * 4) + 140);
       count++;
     }, this);
@@ -102,6 +112,7 @@ export class Main extends Phaser.State {
     life.update(this.gameState);
     maternity.update(this.gameState);
     capitalism.update(this.gameState);
+    morgue.update(this.gameState);
 
     if (money !== this.gameState.money) {
       this.moneyEmitter.start(false, 2000, 10, 5);
@@ -109,13 +120,6 @@ export class Main extends Phaser.State {
     }
 
     this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
-  }
-
-  destroyHuman(human: Human): void {
-    var index = this.gameState.humans.indexOf(human, 0);
-    if (index > -1) {
-      this.gameState.humans.splice(index, 1);
-    }
   }
 
   displayHumans(humans: Human[]) {
@@ -162,9 +166,7 @@ export class Main extends Phaser.State {
     humanSelectorMenu.selected.attach(function (event) {
       event.human.eat(event.selected);
       event.selected.setHealth(0);
-      this.gameState.humans.splice(this.gameState.humans.indexOf(event.selected), 1);
-      this.humansGroup.remove(this.humanSprites[event.selected.getId()]);
-      this.humanSprites.splice(event.selected.getId(), 1);
+
       this.closeMenu(humanSelectorMenu);
     }.bind(this));
   }
@@ -176,6 +178,16 @@ export class Main extends Phaser.State {
     humanSelectorMenu.selected.attach(function (event) {
       bed.fuck(event.human, event.selected);
       this.closeMenu(humanSelectorMenu);
+    }.bind(this));
+  }
+
+  openShop() {
+    let shop = new Shop(this.gameState.money);
+    this.openMenu(shop);
+
+    shop.selected.attach(function (event) {
+
+      this.closeMenu(shop);
     }.bind(this));
   }
 
