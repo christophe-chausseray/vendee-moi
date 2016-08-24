@@ -24,6 +24,5 @@ class Game extends Phaser.Game {
 
 var game = new Game();
 
-
 Phaser.Canvas.setImageRenderingCrisp(game.canvas);  //for Canvas, modern approach
 Phaser.Canvas.setSmoothingEnabled(game.context, false);  //also for Canvas, legacy approach

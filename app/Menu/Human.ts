@@ -12,6 +12,7 @@ export class HumanMenu extends View {
     <ul>
       <li data-action="fuck">Fuck</li>
       <li data-action="eat">Eat</li>
+      <li data-action="prostitute">Prostitute</li>
     </ul>
   `);
 
@@ -23,10 +24,11 @@ export class HumanMenu extends View {
 
   public wantToFuck: SyncEvent<Human> = new SyncEvent<Human>();
   public wantToEat: SyncEvent<Human> = new SyncEvent<Human>();
+  public wantToProstitute: SyncEvent<Human> = new SyncEvent<Human>();
   public className: string = 'human-menu';
 
   render() {
-    this.el = this.createElement(this.template({test: 'coucou, tu veux voir'}));
+    this.el = this.createElement(this.template({}));
     this.bindEvents();
 
     return this;
@@ -39,6 +41,9 @@ export class HumanMenu extends View {
         break;
       case 'fuck':
         this.wantToFuck.post(this.human);
+        break;
+      case 'prostitute':
+        this.wantToProstitute.post(this.human);
         break;
     }
   }

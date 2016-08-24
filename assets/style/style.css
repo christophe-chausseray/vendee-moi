@@ -31,8 +31,8 @@ body {
   text-shadow: -4px 4px rgba(255, 255, 255, 0.3);
   text-align: center;
   background-image: url("/assets/images/grass.png");
-  background-size: 512px 512px;
-  padding-top: 90px;
+  background-size: 350px 350px;
+  padding-top: 60px;
   box-shadow: 0 0 40px black;
 }
 

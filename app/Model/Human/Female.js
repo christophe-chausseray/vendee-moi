@@ -20,13 +20,10 @@ var Female = (function (_super) {
         return this.isPregnant() && this.embryo.getAge() >= 0;
     };
     Female.prototype.ages = function (month) {
-        this.age += month;
-        if (this.isPregnant()) {
-            this.embryo.ages(month);
-        }
+        _super.prototype.ages.call(this, month);
     };
     Female.prototype.canGiveBirth = function () {
-        return true;
+        return !this.isWorking();
     };
     Female.prototype.giveBirth = function () {
         var human = this.embryo;

@@ -13,7 +13,7 @@ export class FuckMenu extends View {
   public template = _.template(`
     <ul>
       <% _.each(fuckables, function (fuckable) { %>
-        <li data-name="<%- fuckable.getName() %>"><%- fuckable.getName() %></li>
+        <li data-id="<%- fuckable.getId() %>"><%- fuckable.getName() %></li>
       <% }) %>
       <li>The dog</li>
       <li>Pipou</li>
@@ -45,7 +45,7 @@ export class FuckMenu extends View {
     this.wantToFuck.post({
       fucker: this.fucker,
       fucked: _.find(this.fuckables, function (fuckable: Human) {
-        return fuckable.getName() === event.currentTarget.dataset.name;
+        return fuckable.getId() === parseInt(event.currentTarget.dataset.id);
       })
     });
   }

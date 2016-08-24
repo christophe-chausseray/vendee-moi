@@ -7,13 +7,15 @@
   var map = {
     'app':       'app',
     'ts-events': 'node_modules/ts-events/dist/ts-events.js',
-    'lodash':    'node_modules/lodash/lodash.js'
+    'lodash':    'node_modules/lodash/lodash.js',
+    'animate':   'node_modules/animate/index.js'
   };
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
     'app':       { main: 'main.js',  defaultExtension: 'js' },
     'ts-events': { defaultExtension: 'js' },
-    'lodash':    { defaultExtension: 'js' }
+    'lodash':    { defaultExtension: 'js' },
+    'animate':   { defaultExtension: 'js' }
   };
 
   var config = {

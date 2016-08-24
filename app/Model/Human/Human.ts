@@ -2,13 +2,18 @@ import { FoodInterface } from '../FoodInterface'
 import { AgeInterface } from '../AgeInterface'
 import { FuckerInterface } from '../FuckerInterface'
 import { FuckableInterface } from '../FuckableInterface'
+import { WorkerInterface } from '../WorkerInterface'
+import { ActivityInterface } from '../Activity/ActivityInterface'
 
 export enum Gender {
   Male,
   Female
 }
 
-export abstract class Human implements FoodInterface, AgeInterface, FuckerInterface, FuckableInterface {
+export abstract class Human implements FoodInterface, AgeInterface, FuckerInterface, FuckableInterface, WorkerInterface {
+  static count : number = 0;
+
+  protected id: number;
   protected mother: Human;
   protected father: Human;
   protected name: string;
@@ -16,6 +21,8 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
   protected consanguinity: number;
   protected age: number;
   protected gender: Gender;
+
+  protected activity: ActivityInterface;
 
   private pubertyAge: number = 12 * 12;
   private menopauseAge: number = 60 * 12;
@@ -28,15 +35,20 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
     health: number = 100,
     age: number = -9
   ) {
-    this.mother        = mother;
-    this.father        = father;
-    this.gender        = gender;
-    this.name          = name;
-    this.age           = age;
+    this.id     = Human.count++;
+    this.mother = mother;
+    this.father = father;
+    this.gender = gender;
+    this.name   = name;
+    this.age    = age;
     this.consanguinity = this.getAncestors().length - this.getAncestors().filter(function (value, index, self) {
       return self.indexOf(value) === index;
     }).length;
-    this.health        = this.consanguinity <= 5 ? health : 0;
+    this.health = this.consanguinity <= 5 ? health : 0;
+  }
+
+  getId(): number {
+    return this.id;
   }
 
   getFertility(): number {
@@ -100,6 +112,18 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
 
   isFucked(fucker: FuckerInterface) {
     this.health -= 0.5;
+  }
+
+  work(activity: ActivityInterface) {
+    this.activity = activity;
+  }
+
+  isWorking() {
+    return undefined !== this.activity;
+  }
+
+  getActivity(): ActivityInterface {
+    return this.activity;
   }
 
   protected getAncestors(): Human[] {

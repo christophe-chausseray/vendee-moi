@@ -11,6 +11,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "animate.css": "^3.5.1",
     "bootstrap": "^3.3.6",
     "core-js": "^2.4.0",
     "lodash.template": "^4.4.0",

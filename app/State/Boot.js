@@ -10,7 +10,7 @@ var Boot = (function (_super) {
         _super.apply(this, arguments);
     }
     Boot.prototype.preload = function () {
-        this.load.image('preload-bar', 'assets/images/preload-bar.png');
+        this.load.image('vendee', 'assets/images/coeur-vendeen.png');
     };
     Boot.prototype.create = function () {
         this.game.stage.backgroundColor = 0xFFFFFF;

@@ -10,15 +10,19 @@ var Preload = (function (_super) {
         _super.apply(this, arguments);
     }
     Preload.prototype.preload = function () {
-        this.preloadBar = this.add.sprite(0, 148, 'preload-bar');
+        this.preloadBar = this.add.sprite(this.game.width / 2, this.game.height / 2, 'vendee');
+        this.preloadBar.anchor.set(0.5);
         this.load.setPreloadSprite(this.preloadBar);
         this.game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
-        this.load.image('menu-background', 'assets/images/coeur-vendeen.png');
         this.load.image('white', 'assets/images/white.png');
         this.load.image('heart', 'assets/images/heart.png');
         this.load.image('teat', 'assets/images/teat.png');
         this.load.image('floor', 'assets/images/floor.png');
         this.load.image('baby', 'assets/images/baby.png');
+        this.load.image('whore', 'assets/images/whore.png');
+        this.load.spritesheet('money', 'assets/images/money.png', 500, 455, 8);
+        this.load.audio('money', ['assets/sounds/money.mp3', 'assets/sounds/money.ogg']);
+        this.load.image('beer', 'assets/images/beer.png');
         for (var i = 1; i < 25; i++) {
             this.load.image('male_' + i, 'assets/images/male/' + i + '.png');
             this.load.image('female_' + i, 'assets/images/female/' + i + '.png');

@@ -24,15 +24,11 @@ export class Female extends Human implements BirthGiverInterface {
   }
 
   ages(month: number) {
-    this.age += month;
-
-    if (this.isPregnant()) {
-      this.embryo.ages(month);
-    }
+    super.ages(month);
   }
 
   canGiveBirth(): boolean {
-    return true;
+    return !this.isWorking();
   }
 
   giveBirth(): Human {

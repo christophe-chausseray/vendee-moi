@@ -1,3 +1,4 @@
 export class GameState {
-  public creatures = []
+  public humans: any[] = [];
+  public money: number = 0;
 }
