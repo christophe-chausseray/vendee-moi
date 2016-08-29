@@ -8,24 +8,13 @@ import { Good } from '../Model/Item/Good'
 
 import { imageProvider } from '../Service/Provider/ImageProvider'
 
-export class Shop extends View {
-  private money: number;
-  private items = [
-    new Good('bread', 2, 'Brioche'),
-    new Good('broccoli', 20, 'Broccoli'),
-    new Good('choux', 1, 'Choux'),
-    new Good('coca', 1, 'Coca'),
-    new Good('coffee', 2, 'Café'),
-    new Good('kechup', 2, 'Kéchup'),
-    new Good('pepper', 2, 'Poivron'),
-    new Good('spam', 2, 'Viande')
-  ];
+export class Inventory extends View {
+  private items = [];
   public template = _.template(`
-    <h1>Superette <span>x</span></h1>
+    <h1>Frigo <span>x</span></h1>
     <ul>
       <% _.each(items, function (item) { %>
         <li data-item="<%- item.code %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
-          <span class="price"><%- item.price %></span>
           <span class="label"><%- item.label %></span>
         </li>
       <% }) %>
@@ -33,17 +22,16 @@ export class Shop extends View {
   `);
   public selected: SyncEvent<any> = new SyncEvent<any>();
   public dismiss: SyncEvent<any> = new SyncEvent<any>();
-  public className: string = 'shop animated bounceIn';
+  public className: string = 'inventory animated bounceIn';
 
-  constructor(money) {
+  constructor(items) {
     super();
 
-    this.money = money;
+    this.items = items;
   }
 
   render() {
     this.el = this.createElement(this.template({
-      money: this.money,
       items: this.items,
       imageProvider: imageProvider
     }));

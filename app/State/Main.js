@@ -9,12 +9,14 @@ var Human_2 = require('../Sprite/Human');
 var Human_3 = require('../Menu/Human');
 var Select_1 = require('../Menu/Select');
 var Shop_1 = require('../Menu/Shop');
+var Inventory_1 = require('../Menu/Inventory');
 var Bed_1 = require('../Service/Bed');
 var HumanFactory_1 = require('../Service/HumanFactory');
 var Maternity_1 = require('../Service/GameUpdater/Maternity');
 var Life_1 = require('../Service/GameUpdater/Life');
 var Capitalism_1 = require('../Service/GameUpdater/Capitalism');
 var Morgue_1 = require('../Service/GameUpdater/Morgue');
+var Merchant_1 = require('../Service/Action/Merchant');
 var Prostitute_1 = require('../Model/Activity/Prostitute');
 var Game_1 = require('./Game');
 var origDragPoint = null;
@@ -34,11 +36,17 @@ var Main = (function (_super) {
         });
         this.shopSprite = this.game.add.image(this.game.width - 160, 30, 'money');
         this.shopSprite.animations.add('fly');
-        this.shopSprite.scale.set(0.3);
+        this.shopSprite.scale.set(0.25);
         this.shopSprite.animations.play('fly', 8, true);
         this.shopSprite.inputEnabled = true;
         this.shopSprite.events.onInputDown.add(function () {
             this.openShop();
+        }.bind(this));
+        this.inventorySprite = this.game.add.image(70, 35, 'fridge');
+        this.inventorySprite.scale.set(0.45);
+        this.inventorySprite.inputEnabled = true;
+        this.inventorySprite.events.onInputDown.add(function () {
+            this.openInventory();
         }.bind(this));
         this.moneyEmitter = this.game.add.emitter(this.game.world.centerX, 70, 5);
         this.moneyEmitter.makeParticles('beer');
@@ -150,7 +158,21 @@ var Main = (function (_super) {
         var shop = new Shop_1.Shop(this.gameState.money);
         this.openMenu(shop);
         shop.selected.attach(function (event) {
+            Merchant_1.merchant.cash(this.gameState, event.item);
             this.closeMenu(shop);
+        }.bind(this));
+        shop.dismiss.attach(function () {
+            this.closeMenu(shop);
+        }.bind(this));
+    };
+    Main.prototype.openInventory = function () {
+        var inventory = new Inventory_1.Inventory(this.gameState.items);
+        this.openMenu(inventory);
+        inventory.selected.attach(function (event) {
+            this.closeMenu(inventory);
+        }.bind(this));
+        inventory.dismiss.attach(function () {
+            this.closeMenu(inventory);
         }.bind(this));
     };
     Main.prototype.openMenu = function (menu) {

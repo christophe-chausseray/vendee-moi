@@ -3,6 +3,7 @@ import { Female } from '../Model/Human/Female'
 import { Gender } from '../Model/Human/Human'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute'
+import { imageProvider } from '../Service/Provider/ImageProvider'
 
 export class HumanSprite extends Phaser.Sprite {
   private humanSprite: Phaser.Image;
@@ -27,9 +28,9 @@ export class HumanSprite extends Phaser.Sprite {
     const columnWidth = 150;
 
     var gender = Gender.Female === human.getGender() ? 'female' : 'male';
-
+    console.log(imageProvider.getImageIdentifier(human));
     const isTeen: boolean = this.human.getAge() <= 12 * 13;
-    this.humanSprite = game.make.image(isTeen ? 0 : -10, isTeen ? 30 : 0, gender + '_' + (human.getId() + 1));
+    this.humanSprite = game.make.image(isTeen ? 0 : -10, isTeen ? 30 : 0, imageProvider.getImageIdentifier(human));
     this.humanSprite.scale.set(isTeen ? 0.4 : 0.5);
 
     this.nameSprite = game.make.text(

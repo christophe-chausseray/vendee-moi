@@ -8,6 +8,7 @@ import { HumanSprite } from '../Sprite/Human';
 import { HumanMenu } from '../Menu/Human';
 import { HumanSelectorMenu } from '../Menu/Select';
 import { Shop } from '../Menu/Shop';
+import { Inventory } from '../Menu/Inventory';
 
 import { BirthGiverInterface } from '../Model/BirthGiverInterface';
 
@@ -17,6 +18,8 @@ import { maternity } from '../Service/GameUpdater/Maternity'
 import { life } from '../Service/GameUpdater/Life'
 import { capitalism } from '../Service/GameUpdater/Capitalism'
 import { morgue } from '../Service/GameUpdater/Morgue'
+
+import { merchant } from '../Service/Action/Merchant'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute';
 
@@ -32,6 +35,7 @@ export class Main extends Phaser.State {
   moneySound: Phaser.Sound;
   amountSprite: Phaser.Text;
   shopSprite: Phaser.Image;
+  inventorySprite: Phaser.Image;
   humansGroup: Phaser.Group;
   moneyEmitter;
 
@@ -46,11 +50,18 @@ export class Main extends Phaser.State {
     });
     this.shopSprite = this.game.add.image(this.game.width - 160, 30, 'money');
     this.shopSprite.animations.add('fly');
-    this.shopSprite.scale.set(0.3);
+    this.shopSprite.scale.set(0.25);
     this.shopSprite.animations.play('fly', 8, true);
     this.shopSprite.inputEnabled = true;
     this.shopSprite.events.onInputDown.add(function () {
        this.openShop();
+    }.bind(this));
+
+    this.inventorySprite = this.game.add.image(70, 35, 'fridge');
+    this.inventorySprite.scale.set(0.45);
+    this.inventorySprite.inputEnabled = true;
+    this.inventorySprite.events.onInputDown.add(function () {
+       this.openInventory();
     }.bind(this));
 
     this.moneyEmitter = this.game.add.emitter(this.game.world.centerX, 70, 5);
@@ -186,8 +197,25 @@ export class Main extends Phaser.State {
     this.openMenu(shop);
 
     shop.selected.attach(function (event) {
-
+      merchant.cash(this.gameState, event.item);
       this.closeMenu(shop);
+    }.bind(this));
+
+    shop.dismiss.attach(function () {
+      this.closeMenu(shop);
+    }.bind(this));
+  }
+
+  openInventory() {
+    let inventory = new Inventory(this.gameState.items);
+    this.openMenu(inventory);
+
+    inventory.selected.attach(function (event) {
+      this.closeMenu(inventory);
+    }.bind(this));
+
+    inventory.dismiss.attach(function () {
+      this.closeMenu(inventory);
     }.bind(this));
   }
 

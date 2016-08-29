@@ -23,6 +23,7 @@ var Preload = (function (_super) {
         this.load.spritesheet('money', 'assets/images/money.png', 500, 455, 8);
         this.load.audio('money', ['assets/sounds/money.mp3', 'assets/sounds/money.ogg']);
         this.load.image('beer', 'assets/images/beer.png');
+        this.load.image('fridge', 'assets/images/fridge.png');
         for (var i = 1; i < 25; i++) {
             this.load.image('male_' + i, 'assets/images/male/' + i + '.png');
             this.load.image('female_' + i, 'assets/images/female/' + i + '.png');

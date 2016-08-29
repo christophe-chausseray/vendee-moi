@@ -6,13 +6,15 @@ import _ = require("lodash");
 import { Human } from '../Model/Human/Human'
 import { View } from './View'
 
+import { imageProvider } from '../Service/Provider/ImageProvider'
+
 export class HumanSelectorMenu extends View {
   private human: Human;
   private humans: Human[];
   public template = _.template(`
     <ul>
       <% _.each(humans, function (human) { %>
-        <li data-id="<%- human.getId() %>" style="background-image: url('<%- url %>');">
+        <li data-id="<%- human.getId() %>" style="background-image: url('<%- imageProvider.getImageUrl(human) %>')">
           <span><%- human.getName() %></span>
         </li>
       <% }) %>
@@ -24,8 +26,8 @@ export class HumanSelectorMenu extends View {
   constructor(human: Human, humans: Human[]) {
     super();
 
-    this.human = human;
-    this.humans  = humans;
+    this.human  = human;
+    this.humans = humans;
   }
 
 
@@ -33,7 +35,8 @@ export class HumanSelectorMenu extends View {
     this.el = this.createElement(this.template({
       humans: this.humans.filter(function (human: Human) {
         return human !== this.human;
-      }.bind(this))
+      }.bind(this)),
+      imageProvider: imageProvider
     }));
     this.bindEvents();
 
