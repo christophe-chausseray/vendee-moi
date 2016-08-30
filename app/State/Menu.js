@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Philippe_1 = require('../Service/Action/Philippe');
 var Menu = (function (_super) {
     __extends(Menu, _super);
     function Menu() {
@@ -15,6 +16,16 @@ var Menu = (function (_super) {
         this.background.anchor.set(0.5);
         this.input.onDown.addOnce(function () {
             _this.game.state.start('main');
+            Philippe_1.philippe.say('Hey! Bienvenue dans Vendée Moi, le meilleur jeu du monde (après les animations du Puy du fou bien sur)');
+            setTimeout(function () {
+                Philippe_1.philippe.say('Tu vas devoir gerer une belle famille vendéenne dans le respect des traditions de ce beau département.');
+            }, 5000);
+            setTimeout(function () {
+                Philippe_1.philippe.say('Bon, faut éviter qu\'ils se tripotent trop entre eux, mais je serais mal placé pour les réprimander');
+            }, 10000);
+            setTimeout(function () {
+                Philippe_1.philippe.say('Pour commencer, tu peux tapoter sur l\'un des membres de ta famille');
+            }, 15000);
         });
     };
     return Menu;

@@ -1,3 +1,5 @@
+import * as tsEvents from 'ts-events';
+import { SyncEvent } from 'ts-events';
 import { View } from '../../Menu/View';
 
 class AlertView extends View {
@@ -6,6 +8,8 @@ class AlertView extends View {
     <img src="/assets/images/philippe.jpg"/>
     <span><%- message %></span>
   `);
+
+  public dismiss: SyncEvent<any> = new SyncEvent<any>();
 
   constructor(message: string) {
     super();
@@ -26,23 +30,36 @@ class AlertView extends View {
 
   bindEvents() {
     this.el.addEventListener('click', function () {
-      window.document.getElementById('alert').style.display = 'none';
-      this.destroy();
+      this.dismiss.post();
     }.bind(this));
   }
 }
 
 class Philippe {
+  alertCount: number = 0;
   say(sentence: string) {
+    this.alertCount++;
     let alertDropZone = window.document.getElementById('alert');
     alertDropZone.style.display = 'block';
     const alertView = new AlertView(sentence);
     alertDropZone.appendChild(alertView.render().el);
 
-    setTimeout(function () {
+    var timeout = setTimeout(function () {
+      this.alertCount--;
       alertView.destroy();
-      alertDropZone.style.display = 'none';
-    }, 5000);
+      if (0 === this.alertCount) {
+        alertDropZone.style.display = 'none';
+      }
+    }.bind(this), 5000);
+
+    alertView.dismiss.attach(function () {
+      clearTimeout(timeout);
+      this.alertCount--;
+      alertView.destroy();
+      if (0 === this.alertCount) {
+        alertDropZone.style.display = 'none';
+      }
+    }.bind(this));
   }
 }
 

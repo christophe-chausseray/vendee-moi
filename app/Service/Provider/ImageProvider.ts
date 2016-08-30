@@ -2,6 +2,7 @@ import { GameState } from '../../State/Game'
 import { Gender } from '../../Model/Human/Human'
 import { Human } from '../../Model/Human/Human'
 import { Good } from '../../Model/Item/Good'
+import { Tool } from '../../Model/Item/Tool'
 
 class ImageProvider {
     private gameState: GameState;
@@ -19,7 +20,7 @@ class ImageProvider {
             '/' +
             (item.getId() + 1) +
             '.png';
-        } else if (item instanceof Good) {
+        } else if (item instanceof Good || item instanceof Tool) {
             return 'assets/images/shop/' +
             item.code +
             '.png';

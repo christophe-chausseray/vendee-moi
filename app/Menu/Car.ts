@@ -5,29 +5,16 @@ import _ = require("lodash");
 
 import { View } from './View'
 import { Good } from '../Model/Item/Good'
-import { Tool } from '../Model/Item/Tool'
 
 import { imageProvider } from '../Service/Provider/ImageProvider'
 
-export class Shop extends View {
-  private money: number;
-  private items = [
-    new Good('bread', 2, 'Brioche'),
-    new Good('broccoli', 20, 'Broccoli'),
-    new Good('choux', 1, 'Choux'),
-    new Good('coca', 1, 'Coca'),
-    new Good('coffee', 2, 'Café'),
-    new Good('kechup', 2, 'Kéchup'),
-    new Good('pepper', 2, 'Poivron'),
-    new Good('spam', 2, 'Viande'),
-    new Tool('condom', 5, 'Capote')
-  ];
+export class Car extends View {
+  private items = [];
   public template = _.template(`
-    <h1>Superette <span>x</span></h1>
+    <h1>La Xantia <span>x</span></h1>
     <ul>
       <% _.each(items, function (item) { %>
-        <li data-item="<%- item.code %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
-          <span class="price"><%- item.price %></span>
+        <li data-item="<%- item.getId() %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
           <span class="label"><%- item.label %></span>
         </li>
       <% }) %>
@@ -35,17 +22,16 @@ export class Shop extends View {
   `);
   public selected: SyncEvent<any> = new SyncEvent<any>();
   public dismiss: SyncEvent<any> = new SyncEvent<any>();
-  public className: string = 'shop animated bounceIn';
+  public className: string = 'car animated bounceIn';
 
-  constructor(money) {
+  constructor(items) {
     super();
 
-    this.money = money;
+    this.items = items;
   }
 
   render() {
     this.el = this.createElement(this.template({
-      money: this.money,
       items: this.items,
       imageProvider: imageProvider
     }));
@@ -56,7 +42,9 @@ export class Shop extends View {
 
   triggerAction(event) {
     this.selected.post({
-      item: _.find(this.items, {code: event.currentTarget.dataset.item})
+      selected: _.find(this.items, function (item: any) {
+        return item.getId() == event.currentTarget.dataset.item;
+      })
     });
   }
 

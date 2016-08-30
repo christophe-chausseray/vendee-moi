@@ -8,7 +8,8 @@ import { HumanSprite } from '../Sprite/Human';
 import { HumanMenu } from '../Menu/Human';
 import { SelectorMenu } from '../Menu/Select';
 import { Shop } from '../Menu/Shop';
-import { Inventory } from '../Menu/Inventory';
+import { Fridge } from '../Menu/Fridge';
+import { Car } from '../Menu/Car';
 
 import { BirthGiverInterface } from '../Model/BirthGiverInterface';
 
@@ -165,7 +166,7 @@ export class Main extends Phaser.State {
   }
 
   openEatMenu(human: Human) {
-    let inventory = new Inventory([...this.gameState.humans.filter(function (item) {
+    let inventory = new Fridge([...this.gameState.humans.filter(function (item) {
       return item !== human;
     }), ...this.gameState.items]);
     this.openMenu(inventory);
@@ -206,15 +207,15 @@ export class Main extends Phaser.State {
   }
 
   openInventory() {
-    let inventory = new Inventory([...this.gameState.humans, ...this.gameState.items]);
-    this.openMenu(inventory);
+    let car = new Car(this.gameState.items);
+    this.openMenu(car);
 
-    inventory.selected.attach(function (event) {
-      this.closeMenu(inventory);
+    car.selected.attach(function (event) {
+      this.closeMenu(car);
     }.bind(this));
 
-    inventory.dismiss.attach(function () {
-      this.closeMenu(inventory);
+    car.dismiss.attach(function () {
+      this.closeMenu(car);
     }.bind(this));
   }
 

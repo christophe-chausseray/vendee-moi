@@ -8,7 +8,7 @@ import { Good } from '../Model/Item/Good'
 
 import { imageProvider } from '../Service/Provider/ImageProvider'
 
-export class Inventory extends View {
+export class Fridge extends View {
   private items = [];
   public template = _.template(`
     <h1>Frigo <span>x</span></h1>

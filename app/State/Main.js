@@ -9,7 +9,8 @@ var Human_2 = require('../Sprite/Human');
 var Human_3 = require('../Menu/Human');
 var Select_1 = require('../Menu/Select');
 var Shop_1 = require('../Menu/Shop');
-var Inventory_1 = require('../Menu/Inventory');
+var Fridge_1 = require('../Menu/Fridge');
+var Car_1 = require('../Menu/Car');
 var Bed_1 = require('../Service/Bed');
 var HumanFactory_1 = require('../Service/HumanFactory');
 var Maternity_1 = require('../Service/GameUpdater/Maternity');
@@ -134,7 +135,7 @@ var Main = (function (_super) {
         }.bind(this));
     };
     Main.prototype.openEatMenu = function (human) {
-        var inventory = new Inventory_1.Inventory(this.gameState.humans.filter(function (item) {
+        var inventory = new Fridge_1.Fridge(this.gameState.humans.filter(function (item) {
             return item !== human;
         }).concat(this.gameState.items));
         this.openMenu(inventory);
@@ -166,13 +167,13 @@ var Main = (function (_super) {
         }.bind(this));
     };
     Main.prototype.openInventory = function () {
-        var inventory = new Inventory_1.Inventory(this.gameState.humans.concat(this.gameState.items));
-        this.openMenu(inventory);
-        inventory.selected.attach(function (event) {
-            this.closeMenu(inventory);
+        var car = new Car_1.Car(this.gameState.items);
+        this.openMenu(car);
+        car.selected.attach(function (event) {
+            this.closeMenu(car);
         }.bind(this));
-        inventory.dismiss.attach(function () {
-            this.closeMenu(inventory);
+        car.dismiss.attach(function () {
+            this.closeMenu(car);
         }.bind(this));
     };
     Main.prototype.openMenu = function (menu) {
