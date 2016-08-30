@@ -4,13 +4,21 @@ import { FuckerInterface } from '../FuckerInterface'
 import { FuckableInterface } from '../FuckableInterface'
 import { WorkerInterface } from '../WorkerInterface'
 import { ActivityInterface } from '../Activity/ActivityInterface'
+import { SelectableInterface } from '../Item/SelectableInterface'
 
 export enum Gender {
   Male,
   Female
 }
 
-export abstract class Human implements FoodInterface, AgeInterface, FuckerInterface, FuckableInterface, WorkerInterface {
+export abstract class Human implements
+  FoodInterface,
+  AgeInterface,
+  FuckerInterface,
+  FuckableInterface,
+  WorkerInterface,
+  SelectableInterface
+{
   static count : number = 0;
 
   protected id: number;
@@ -21,6 +29,7 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
   protected consanguinity: number;
   protected age: number;
   protected gender: Gender;
+  protected sick: boolean = true;
 
   protected activity: ActivityInterface;
 
@@ -45,10 +54,15 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
       return self.indexOf(value) === index;
     }).length;
     this.health = this.consanguinity <= 5 ? health : 0;
+    this.sick   = (this.mother && this.mother.isSick()) || (this.mother && this.father.isSick());
   }
 
   getId(): number {
     return this.id;
+  }
+
+  getLabel(): string {
+    return this.getName();
   }
 
   getFertility(): number {
@@ -80,6 +94,14 @@ export abstract class Human implements FoodInterface, AgeInterface, FuckerInterf
 
   getMother(): Human {
     return this.mother;
+  }
+
+  isSick(): boolean {
+    return this.sick;
+  }
+
+  setSick(sick: boolean) {
+    this.sick = sick;
   }
 
   getFather(): Human {

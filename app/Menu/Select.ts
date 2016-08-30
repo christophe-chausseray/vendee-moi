@@ -8,14 +8,14 @@ import { View } from './View'
 
 import { imageProvider } from '../Service/Provider/ImageProvider'
 
-export class HumanSelectorMenu extends View {
-  private human: Human;
-  private humans: Human[];
+export class SelectorMenu extends View {
+  private item: any;
+  private items: any[];
   public template = _.template(`
     <ul>
-      <% _.each(humans, function (human) { %>
-        <li data-id="<%- human.getId() %>" style="background-image: url('<%- imageProvider.getImageUrl(human) %>')">
-          <span><%- human.getName() %></span>
+      <% _.each(items, function (item) { %>
+        <li data-id="<%- item.getId() %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
+          <span><%- item.getLabel() %></span>
         </li>
       <% }) %>
     </ul>
@@ -23,18 +23,18 @@ export class HumanSelectorMenu extends View {
   public selected: SyncEvent<any> = new SyncEvent<any>();
   public className: string = 'select-menu animated bounceIn';
 
-  constructor(human: Human, humans: Human[]) {
+  constructor(item: any, items: any[]) {
     super();
 
-    this.human  = human;
-    this.humans = humans;
+    this.item  = item;
+    this.items = items;
   }
 
 
   render() {
     this.el = this.createElement(this.template({
-      humans: this.humans.filter(function (human: Human) {
-        return human !== this.human;
+      items: this.items.filter(function (item: any) {
+        return item !== this.item;
       }.bind(this)),
       imageProvider: imageProvider
     }));
@@ -45,9 +45,9 @@ export class HumanSelectorMenu extends View {
 
   triggerAction(event) {
     this.selected.post({
-      human: this.human,
-      selected: _.find(this.humans, function (human: Human) {
-        return human.getId() === parseInt(event.currentTarget.dataset.id);
+      item: this.item,
+      selected: _.find(this.items, function (item: any) {
+        return item.getId() == event.currentTarget.dataset.id;
       })
     });
   }

@@ -1,5 +1,7 @@
 import { Female } from '../../Model/Human/Female'
+import { Gender } from '../../Model/Human/Human'
 import { GameUpdaterInterface } from './GameUpdaterInterface'
+import { philippe } from '../Action/Philippe'
 
 class Maternity implements GameUpdaterInterface {
   update(gameState) {
@@ -10,7 +12,9 @@ class Maternity implements GameUpdaterInterface {
           }
 
           if (human.shouldGiveBirth()) {
-            gameState.humans.push(human.giveBirth());
+            const newBorn = human.giveBirth();
+            philippe.say('Tiens, ' + (newBorn.getGender() === Gender.Female ? 'la petite' : 'le petit') + ' ' + newBorn.getName() + ' vient de rejoindre cette magnifique famille');
+            gameState.humans.push(newBorn);
           }
       }
     }

@@ -14,7 +14,7 @@ export class Inventory extends View {
     <h1>Frigo <span>x</span></h1>
     <ul>
       <% _.each(items, function (item) { %>
-        <li data-item="<%- item.code %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
+        <li data-item="<%- item.getId() %>" style="background-image: url('<%- imageProvider.getImageUrl(item) %>')">
           <span class="label"><%- item.label %></span>
         </li>
       <% }) %>
@@ -42,7 +42,9 @@ export class Inventory extends View {
 
   triggerAction(event) {
     this.selected.post({
-      item: _.find(this.items, {code: event.currentTarget.dataset.item})
+      selected: _.find(this.items, function (item: any) {
+        return item.getId() == event.currentTarget.dataset.item;
+      })
     });
   }
 

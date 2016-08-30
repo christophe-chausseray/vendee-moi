@@ -8,6 +8,7 @@ var Human = (function () {
     function Human(mother, father, gender, name, health, age) {
         if (health === void 0) { health = 100; }
         if (age === void 0) { age = -9; }
+        this.sick = true;
         this.pubertyAge = 12 * 12;
         this.menopauseAge = 60 * 12;
         this.id = Human.count++;
@@ -20,9 +21,13 @@ var Human = (function () {
             return self.indexOf(value) === index;
         }).length;
         this.health = this.consanguinity <= 5 ? health : 0;
+        this.sick = (this.mother && this.mother.isSick()) || (this.mother && this.father.isSick());
     }
     Human.prototype.getId = function () {
         return this.id;
+    };
+    Human.prototype.getLabel = function () {
+        return this.getName();
     };
     Human.prototype.getFertility = function () {
         if (this.age < this.pubertyAge || this.age > this.menopauseAge || this.getConsanguinity() >= 5) {
@@ -46,6 +51,12 @@ var Human = (function () {
     };
     Human.prototype.getMother = function () {
         return this.mother;
+    };
+    Human.prototype.isSick = function () {
+        return this.sick;
+    };
+    Human.prototype.setSick = function (sick) {
+        this.sick = sick;
     };
     Human.prototype.getFather = function () {
         return this.father;

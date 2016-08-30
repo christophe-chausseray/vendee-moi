@@ -14,9 +14,11 @@ var Bed_1 = require('../Service/Bed');
 var HumanFactory_1 = require('../Service/HumanFactory');
 var Maternity_1 = require('../Service/GameUpdater/Maternity');
 var Life_1 = require('../Service/GameUpdater/Life');
+var Sexuality_1 = require('../Service/GameUpdater/Sexuality');
 var Capitalism_1 = require('../Service/GameUpdater/Capitalism');
 var Morgue_1 = require('../Service/GameUpdater/Morgue');
 var Merchant_1 = require('../Service/Action/Merchant');
+var Cantina_1 = require('../Service/Action/Cantina');
 var Prostitute_1 = require('../Model/Activity/Prostitute');
 var Game_1 = require('./Game');
 var origDragPoint = null;
@@ -24,7 +26,6 @@ var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         _super.apply(this, arguments);
-        this.humanSprites = [];
     }
     Main.prototype.create = function () {
         this.stage.backgroundColor = 0x000000;
@@ -42,8 +43,8 @@ var Main = (function (_super) {
         this.shopSprite.events.onInputDown.add(function () {
             this.openShop();
         }.bind(this));
-        this.inventorySprite = this.game.add.image(70, 35, 'fridge');
-        this.inventorySprite.scale.set(0.45);
+        this.inventorySprite = this.game.add.image(50, 35, 'car');
+        this.inventorySprite.scale.set(1);
         this.inventorySprite.inputEnabled = true;
         this.inventorySprite.events.onInputDown.add(function () {
             this.openInventory();
@@ -65,10 +66,9 @@ var Main = (function (_super) {
         this.gameState.humans.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Female, 17 * 12));
         this.gameState.humans.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Male, 21 * 12));
         this.gameState.humans.push(HumanFactory_1.humanFactory.create(null, null, Human_1.Gender.Female, 14 * 12));
+        this.displayHumans(this.gameState.humans);
     };
     Main.prototype.update = function () {
-        this.displayHumans(this.gameState.humans);
-        this.amountSprite.text = String(this.gameState.money);
         if (this.game.input.activePointer.isDown && !this.game.paused) {
             if (origDragPoint) {
                 this.game.camera.y += origDragPoint.y - this.game.input.activePointer.position.y;
@@ -78,23 +78,16 @@ var Main = (function (_super) {
         else {
             origDragPoint = null;
         }
-        var count = 0;
-        this.humansGroup.forEach(function (sprite) {
-            if (-1 === this.gameState.humans.indexOf(sprite.human)) {
-                this.humansGroup.remove(sprite);
-                this.humanSprites.splice(sprite.human, 1);
-            }
-            sprite.position.set(10, count * (sprite.height * 4) + 140);
-            count++;
-        }, this);
         if (this.humansGroup.height + this.humansGroup.position.x + 400 > this.game.height) {
             this.game.world.resize(this.game.width, this.humansGroup.height + this.humansGroup.position.x + 400);
         }
+        this.amountSprite.text = String(this.gameState.money);
     };
     Main.prototype.monthElapsed = function () {
         var money = this.gameState.money;
         Life_1.life.update(this.gameState);
         Maternity_1.maternity.update(this.gameState);
+        Sexuality_1.sexuality.update(this.gameState);
         Capitalism_1.capitalism.update(this.gameState);
         Morgue_1.morgue.update(this.gameState);
         if (money !== this.gameState.money) {
@@ -102,20 +95,23 @@ var Main = (function (_super) {
             this.moneySound.play();
         }
         this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
+        this.displayHumans(this.gameState.humans);
     };
     Main.prototype.displayHumans = function (humans) {
+        this.humansGroup.removeAll();
+        var top = 140;
         for (var _i = 0, humans_1 = humans; _i < humans_1.length; _i++) {
             var human = humans_1[_i];
-            if (undefined === this.humanSprites[human.getId()]) {
+            if (0 < human.getHealth()) {
                 var humanSprite = new Human_2.HumanSprite(this.game, 0, 0, human);
                 humanSprite.scale.set(1.3);
                 humanSprite.events.onInputDown.add(function (humanSprite) {
                     this.openHumanDetails(humanSprite.getHuman());
                 }.bind(this));
-                this.humanSprites[human.getId()] = humanSprite;
+                humanSprite.position.set(10, top);
                 this.humansGroup.add(humanSprite);
+                top += humanSprite.height * 4;
             }
-            this.humanSprites[human.getId()].update();
         }
     };
     Main.prototype.openHumanDetails = function (human) {
@@ -138,19 +134,23 @@ var Main = (function (_super) {
         }.bind(this));
     };
     Main.prototype.openEatMenu = function (human) {
-        var humanSelectorMenu = new Select_1.HumanSelectorMenu(human, this.gameState.humans);
-        this.openMenu(humanSelectorMenu);
-        humanSelectorMenu.selected.attach(function (event) {
-            event.human.eat(event.selected);
-            event.selected.setHealth(0);
-            this.closeMenu(humanSelectorMenu);
+        var inventory = new Inventory_1.Inventory(this.gameState.humans.filter(function (item) {
+            return item !== human;
+        }).concat(this.gameState.items));
+        this.openMenu(inventory);
+        inventory.selected.attach(function (event) {
+            Cantina_1.cantina.eat(human, event.selected, this.gameState);
+            this.closeMenu(inventory);
+        }.bind(this));
+        inventory.dismiss.attach(function () {
+            this.closeMenu(inventory);
         }.bind(this));
     };
     Main.prototype.openFuckMenu = function (human) {
-        var humanSelectorMenu = new Select_1.HumanSelectorMenu(human, this.gameState.humans);
+        var humanSelectorMenu = new Select_1.SelectorMenu(human, this.gameState.humans);
         this.openMenu(humanSelectorMenu);
         humanSelectorMenu.selected.attach(function (event) {
-            Bed_1.bed.fuck(event.human, event.selected);
+            Bed_1.bed.fuck(human, event.selected);
             this.closeMenu(humanSelectorMenu);
         }.bind(this));
     };
@@ -166,7 +166,7 @@ var Main = (function (_super) {
         }.bind(this));
     };
     Main.prototype.openInventory = function () {
-        var inventory = new Inventory_1.Inventory(this.gameState.items);
+        var inventory = new Inventory_1.Inventory(this.gameState.humans.concat(this.gameState.items));
         this.openMenu(inventory);
         inventory.selected.attach(function (event) {
             this.closeMenu(inventory);

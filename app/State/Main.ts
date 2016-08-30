@@ -6,7 +6,7 @@ import { Male } from '../Model/Human/Male';
 import { HumanSprite } from '../Sprite/Human';
 
 import { HumanMenu } from '../Menu/Human';
-import { HumanSelectorMenu } from '../Menu/Select';
+import { SelectorMenu } from '../Menu/Select';
 import { Shop } from '../Menu/Shop';
 import { Inventory } from '../Menu/Inventory';
 
@@ -16,10 +16,12 @@ import { bed } from '../Service/Bed';
 import { humanFactory } from '../Service/HumanFactory'
 import { maternity } from '../Service/GameUpdater/Maternity'
 import { life } from '../Service/GameUpdater/Life'
+import { sexuality } from '../Service/GameUpdater/Sexuality'
 import { capitalism } from '../Service/GameUpdater/Capitalism'
 import { morgue } from '../Service/GameUpdater/Morgue'
 
 import { merchant } from '../Service/Action/Merchant'
+import { cantina } from '../Service/Action/Cantina'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute';
 
@@ -30,7 +32,6 @@ var origDragPoint = null;
 export class Main extends Phaser.State {
   gameState: GameState;
   monthElapsedTimer;
-  humanSprites = [];
   moneySprite: Phaser.Image;
   moneySound: Phaser.Sound;
   amountSprite: Phaser.Text;
@@ -57,8 +58,8 @@ export class Main extends Phaser.State {
        this.openShop();
     }.bind(this));
 
-    this.inventorySprite = this.game.add.image(70, 35, 'fridge');
-    this.inventorySprite.scale.set(0.45);
+    this.inventorySprite = this.game.add.image(50, 35, 'car');
+    this.inventorySprite.scale.set(1);
     this.inventorySprite.inputEnabled = true;
     this.inventorySprite.events.onInputDown.add(function () {
        this.openInventory();
@@ -86,12 +87,10 @@ export class Main extends Phaser.State {
     this.gameState.humans.push(humanFactory.create(null, null, Gender.Female, 17 * 12));
     this.gameState.humans.push(humanFactory.create(null, null, Gender.Male, 21 * 12));
     this.gameState.humans.push(humanFactory.create(null, null, Gender.Female, 14 * 12));
+    this.displayHumans(this.gameState.humans);
   }
 
   update() {
-    this.displayHumans(this.gameState.humans);
-    this.amountSprite.text = String(this.gameState.money);
-
     if (this.game.input.activePointer.isDown && !this.game.paused) {
       if (origDragPoint) {
         this.game.camera.y += origDragPoint.y - this.game.input.activePointer.position.y;
@@ -102,26 +101,17 @@ export class Main extends Phaser.State {
       origDragPoint = null;
     }
 
-    var count = 0;
-    this.humansGroup.forEach(function (sprite) {
-      if (-1 === this.gameState.humans.indexOf(sprite.human)) {
-        this.humansGroup.remove(sprite);
-        this.humanSprites.splice(sprite.human, 1);
-      }
-
-      sprite.position.set(10, count * (sprite.height * 4) + 140);
-      count++;
-    }, this);
-
     if (this.humansGroup.height + this.humansGroup.position.x + 400 > this.game.height) {
       this.game.world.resize(this.game.width, this.humansGroup.height + this.humansGroup.position.x + 400);
     }
+    this.amountSprite.text = String(this.gameState.money);
   }
 
   monthElapsed(): void {
     const money = this.gameState.money;
     life.update(this.gameState);
     maternity.update(this.gameState);
+    sexuality.update(this.gameState);
     capitalism.update(this.gameState);
     morgue.update(this.gameState);
 
@@ -131,21 +121,25 @@ export class Main extends Phaser.State {
     }
 
     this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
+    this.displayHumans(this.gameState.humans);
   }
 
   displayHumans(humans: Human[]) {
+    this.humansGroup.removeAll();
+    let top = 140;
     for (let human of humans) {
-      if (undefined === this.humanSprites[human.getId()]) {
+      if (0 < human.getHealth()) {
         var humanSprite = new HumanSprite(this.game, 0, 0, human);
         humanSprite.scale.set(1.3);
         humanSprite.events.onInputDown.add(function (humanSprite) {
            this.openHumanDetails(humanSprite.getHuman());
         }.bind(this));
-        this.humanSprites[human.getId()] = humanSprite;
-        this.humansGroup.add(humanSprite);
-      }
 
-      this.humanSprites[human.getId()].update();
+        humanSprite.position.set(10, top);
+        this.humansGroup.add(humanSprite);
+
+        top += humanSprite.height * 4;
+      }
     }
   }
 
@@ -171,23 +165,28 @@ export class Main extends Phaser.State {
   }
 
   openEatMenu(human: Human) {
-    let humanSelectorMenu = new HumanSelectorMenu(human, this.gameState.humans);
-    this.openMenu(humanSelectorMenu);
+    let inventory = new Inventory([...this.gameState.humans.filter(function (item) {
+      return item !== human;
+    }), ...this.gameState.items]);
+    this.openMenu(inventory);
 
-    humanSelectorMenu.selected.attach(function (event) {
-      event.human.eat(event.selected);
-      event.selected.setHealth(0);
+    inventory.selected.attach(function (event) {
+      cantina.eat(human, event.selected, this.gameState);
 
-      this.closeMenu(humanSelectorMenu);
+      this.closeMenu(inventory);
+    }.bind(this));
+
+    inventory.dismiss.attach(function () {
+      this.closeMenu(inventory);
     }.bind(this));
   }
 
   openFuckMenu(human: Human) {
-    let humanSelectorMenu = new HumanSelectorMenu(human, this.gameState.humans);
+    let humanSelectorMenu = new SelectorMenu(human, this.gameState.humans);
     this.openMenu(humanSelectorMenu);
 
     humanSelectorMenu.selected.attach(function (event) {
-      bed.fuck(event.human, event.selected);
+      bed.fuck(human, event.selected);
       this.closeMenu(humanSelectorMenu);
     }.bind(this));
   }
@@ -207,7 +206,7 @@ export class Main extends Phaser.State {
   }
 
   openInventory() {
-    let inventory = new Inventory(this.gameState.items);
+    let inventory = new Inventory([...this.gameState.humans, ...this.gameState.items]);
     this.openMenu(inventory);
 
     inventory.selected.attach(function (event) {
