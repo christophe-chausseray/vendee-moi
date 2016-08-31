@@ -10,6 +10,8 @@ class ImageProvider {
     getImageIdentifier(item: any) {
         if (item instanceof Human) {
             return (item.getGender() === Gender.Female ? 'female' : 'male') + '_' + (item.getId() + 1);
+        } else if (item instanceof Good || item instanceof Tool) {
+            return item.getId();
         }
     }
 

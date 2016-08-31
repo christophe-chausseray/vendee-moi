@@ -10,9 +10,10 @@ export class HumanMenu extends View {
   private human: Human;
   public template = _.template(`
     <ul class="animated slideInUp">
-      <li data-action="fuck">Fuck</li>
-      <li data-action="eat">Eat</li>
-      <li data-action="prostitute">Prostitute</li>
+      <li data-action="fuck">Trouspiner</li>
+      <li data-action="eat">Rissouner</li>
+      <li data-action="prostitute">Prostituer</li>
+      <li data-action="equip">Enfiler</li>
       <li data-action="cancel">Cancel</li>
     </ul>
   `);
@@ -26,6 +27,7 @@ export class HumanMenu extends View {
   public wantToFuck: SyncEvent<Human> = new SyncEvent<Human>();
   public wantToEat: SyncEvent<Human> = new SyncEvent<Human>();
   public wantToProstitute: SyncEvent<Human> = new SyncEvent<Human>();
+  public wantToEquip: SyncEvent<Human> = new SyncEvent<Human>();
   public wantToCancel: SyncEvent<string> = new SyncEvent<string>();
   public className: string = 'human-menu';
 
@@ -46,6 +48,9 @@ export class HumanMenu extends View {
         break;
       case 'prostitute':
         this.wantToProstitute.post(this.human);
+        break;
+      case 'equip':
+        this.wantToEquip.post(this.human);
         break;
       case 'cancel':
         this.wantToCancel.post('string');

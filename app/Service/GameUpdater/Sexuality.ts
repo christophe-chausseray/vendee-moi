@@ -9,7 +9,7 @@ class Sexuality implements GameUpdaterInterface {
       if (human.isWorking() && human.getActivity() instanceof ProstituteActivity && !human.isSick()) {
         const sick = Math.random() < 0.1;
 
-        if (sick) {
+        if (sick && (!human.getEquipment() || 'condom' !== human.getEquipment().code)) {
           philippe.say('Diantre, je crois que ' + human.getName() + ' a attrapé la chtouille en se frottant trop sur le trotoire!');
           human.setSick(true);
         }

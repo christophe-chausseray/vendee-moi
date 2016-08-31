@@ -30,6 +30,7 @@ export abstract class Human implements
   protected age: number;
   protected gender: Gender;
   protected sick: boolean = true;
+  protected equipment: any;
 
   protected activity: ActivityInterface;
 
@@ -146,6 +147,14 @@ export abstract class Human implements
 
   getActivity(): ActivityInterface {
     return this.activity;
+  }
+
+  setEquipment(equipment) {
+    this.equipment = equipment;
+  }
+
+  getEquipment() {
+    return this.equipment;
   }
 
   protected getAncestors(): Human[] {

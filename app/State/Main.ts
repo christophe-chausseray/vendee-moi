@@ -157,8 +157,15 @@ export class Main extends Phaser.State {
       this.openFuckMenu(human);
     }.bind(this));
     humanMenu.wantToProstitute.attach(function (human: Human) {
-      human.work(new ProstituteActivity());
+      if (!(human instanceof Female) || !human.isPregnant()) {
+        human.work(new ProstituteActivity());
+      }
+
       this.closeMenu(humanMenu);
+    }.bind(this));
+    humanMenu.wantToEquip.attach(function (human: Human) {
+      this.closeMenu(humanMenu);
+      this.openInventory(human);
     }.bind(this));
     humanMenu.wantToCancel.attach(function (human: Human) {
       this.closeMenu(humanMenu);
@@ -206,11 +213,14 @@ export class Main extends Phaser.State {
     }.bind(this));
   }
 
-  openInventory() {
+  openInventory(human: Human = null) {
     let car = new Car(this.gameState.items);
     this.openMenu(car);
 
     car.selected.attach(function (event) {
+      if (null !== human) {
+        human.setEquipment(event.selected);
+      }
       this.closeMenu(car);
     }.bind(this));
 

@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Female_1 = require('../Model/Human/Female');
 var Human_1 = require('../Model/Human/Human');
 var Human_2 = require('../Sprite/Human');
 var Human_3 = require('../Menu/Human');
@@ -127,8 +128,14 @@ var Main = (function (_super) {
             this.openFuckMenu(human);
         }.bind(this));
         humanMenu.wantToProstitute.attach(function (human) {
-            human.work(new Prostitute_1.ProstituteActivity());
+            if (!(human instanceof Female_1.Female) || !human.isPregnant()) {
+                human.work(new Prostitute_1.ProstituteActivity());
+            }
             this.closeMenu(humanMenu);
+        }.bind(this));
+        humanMenu.wantToEquip.attach(function (human) {
+            this.closeMenu(humanMenu);
+            this.openInventory(human);
         }.bind(this));
         humanMenu.wantToCancel.attach(function (human) {
             this.closeMenu(humanMenu);
@@ -166,10 +173,14 @@ var Main = (function (_super) {
             this.closeMenu(shop);
         }.bind(this));
     };
-    Main.prototype.openInventory = function () {
+    Main.prototype.openInventory = function (human) {
+        if (human === void 0) { human = null; }
         var car = new Car_1.Car(this.gameState.items);
         this.openMenu(car);
         car.selected.attach(function (event) {
+            if (null !== human) {
+                human.setEquipment(event.selected);
+            }
             this.closeMenu(car);
         }.bind(this));
         car.dismiss.attach(function () {

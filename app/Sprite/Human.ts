@@ -1,12 +1,14 @@
 import { Human } from '../Model/Human/Human'
 import { Female } from '../Model/Human/Female'
 import { Gender } from '../Model/Human/Human'
+import { Tool } from '../Model/Item/Tool'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute'
 import { imageProvider } from '../Service/Provider/ImageProvider'
 
 export class HumanSprite extends Phaser.Sprite {
   private humanSprite: Phaser.Image;
+  private equipmentSprite: Phaser.Image;
   private nameSprite: Phaser.Text;
   private healthSprite: Phaser.TileSprite;
   private heartSprite: Phaser.Image;
@@ -31,6 +33,11 @@ export class HumanSprite extends Phaser.Sprite {
     const isTeen: boolean = this.human.getAge() <= 12 * 13;
     this.humanSprite = game.make.image(isTeen ? 0 : -10, isTeen ? 30 : 0, imageProvider.getImageIdentifier(human));
     this.humanSprite.scale.set(isTeen ? 0.4 : 0.5);
+
+    this.equipmentSprite = game.make.image(15, 40);
+    this.equipmentSprite.scale.set(1);
+    this.equipmentSprite.anchor.setTo(0.5, 0.5);
+    this.equipmentSprite.angle = 90;
 
     if (human.isSick()) {
       this.humanSprite.tint = 0xcefd26;
@@ -81,6 +88,7 @@ export class HumanSprite extends Phaser.Sprite {
     this.addChild(this.teatSprite);
     this.addChild(this.ageSprite);
     this.addChild(this.consanguinitySprite);
+    this.addChild(this.equipmentSprite);
 
     if (this.human instanceof Female) {
       this.babySprite = game.make.image(columnWidth - 32, 95, 'baby');
@@ -115,6 +123,12 @@ export class HumanSprite extends Phaser.Sprite {
     } else if (health >= 0) {
       this.healthSprite.tint = 0xee0000;
     }
+    if (this.human.getEquipment() && this.human.getEquipment() instanceof Tool && 'condom' === this.human.getEquipment().code) {
+      this.equipmentSprite.alpha = 1;
+      this.equipmentSprite.loadTexture(imageProvider.getImageIdentifier(this.human.getEquipment()));
+    } else {
+      this.equipmentSprite.alpha = 0;
+    }
 
     const fertility = Math.round(this.human.getFertility() * 100);
     this.fertilitySprite.width = fertility * barLength;
@@ -124,7 +138,7 @@ export class HumanSprite extends Phaser.Sprite {
       if (female.isPregnant()) {
         this.pregnancySprite.width = (female.getEmbryo().getAge() + 9) / 9 * 100 * barLength;
         this.pregnancySprite.alpha = 1;
-        this.babySprite.alpha = 1
+        this.babySprite.alpha = 1;
       } else {
         this.pregnancySprite.width = 0;
         this.pregnancySprite.alpha = 0;

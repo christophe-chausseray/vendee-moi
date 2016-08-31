@@ -19,6 +19,7 @@ export class Preload extends Phaser.State {
     this.load.audio('money', ['assets/sounds/money.mp3', 'assets/sounds/money.ogg'])
     this.load.image('beer', 'assets/images/beer.png');
     this.load.image('car', 'assets/images/car.png');
+    this.load.image('condom', 'assets/images/shop/condom.png');
 
     for (var i = 1; i < 25; i++) {
       this.load.image('male_' + i, 'assets/images/male/' + i + '.png');

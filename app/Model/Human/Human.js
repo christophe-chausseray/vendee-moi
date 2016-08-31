@@ -91,6 +91,12 @@ var Human = (function () {
     Human.prototype.getActivity = function () {
         return this.activity;
     };
+    Human.prototype.setEquipment = function (equipment) {
+        this.equipment = equipment;
+    };
+    Human.prototype.getEquipment = function () {
+        return this.equipment;
+    };
     Human.prototype.getAncestors = function () {
         var motherAncestors = null !== this.mother ? this.mother.getAncestors().concat([this.mother]) : [];
         var fatherAncestors = null !== this.father ? this.father.getAncestors().concat([this.father]) : [];
