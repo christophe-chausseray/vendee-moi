@@ -220,6 +220,7 @@ export class Main extends Phaser.State {
     car.selected.attach(function (event) {
       if (null !== human) {
         human.setEquipment(event.selected);
+        this.gameState.items.splice(this.gameState.items.indexOf(event.selected), 1);
       }
       this.closeMenu(car);
     }.bind(this));

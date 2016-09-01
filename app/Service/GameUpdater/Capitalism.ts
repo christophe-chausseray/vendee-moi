@@ -14,6 +14,7 @@ class Capitalism implements GameUpdaterInterface {
           profitability /= Gender.Female === human.getGender() ? 1 : 2;
           gameState.money += Math.round(human.getActivity().getRevenue() * profitability);
           human.work(undefined);
+          human.setEquipment(null);
         }
       }
     }
