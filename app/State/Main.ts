@@ -26,6 +26,8 @@ import { cantina } from '../Service/Action/Cantina'
 
 import { ProstituteActivity } from '../Model/Activity/Prostitute';
 
+import { philippe } from '../Service/Action/Philippe'
+
 import { GameState } from './Game';
 
 var origDragPoint = null;
@@ -34,8 +36,11 @@ export class Main extends Phaser.State {
   gameState: GameState;
   monthElapsedTimer;
   moneySprite: Phaser.Image;
+  humanSprite: Phaser.Image;
   moneySound: Phaser.Sound;
+  jimmySound: Phaser.Sound;
   amountSprite: Phaser.Text;
+  spotsSprite: Phaser.Text;
   shopSprite: Phaser.Image;
   inventorySprite: Phaser.Image;
   humansGroup: Phaser.Group;
@@ -45,11 +50,43 @@ export class Main extends Phaser.State {
     this.stage.backgroundColor = 0x000000;
 
     var floor: Phaser.TileSprite = this.game.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'floor');
-    this.amountSprite = this.game.add.text(this.game.world.centerX, 70, '', {
-      font: '30px Press Start 2P',
+    this.amountSprite = this.game.add.text(this.game.world.centerX + 80, 70, '', {
+      font: '25px Press Start 2P',
       fill: '#ffffff',
       align: 'right'
     });
+
+    this.inventorySprite = this.game.add.image(40, 35, 'car');
+    this.inventorySprite.scale.set(1);
+    this.inventorySprite.inputEnabled = true;
+    this.inventorySprite.events.onInputDown.add(function () {
+       this.openInventory();
+    }.bind(this));
+
+    this.moneyEmitter = this.game.add.emitter(this.game.world.centerX + 80, 70, 5);
+    this.moneyEmitter.makeParticles('beer');
+    this.moneyEmitter.gravity = -200;
+    this.moneyEmitter.angle = Math.random();
+    this.moneyEmitter.minParticleScale = 0.5;
+    this.moneyEmitter.maxParticleScale = 1.2;
+    this.moneySound = this.game.add.audio('money');
+
+    this.jimmySound = this.game.add.audio('jimmy');
+
+    this.moneySprite = this.game.add.image(this.game.world.centerX + 100, 22, 'beer');
+    this.moneySprite.scale.set(0.6);
+    this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
+
+    this.spotsSprite = this.game.add.text(this.game.world.centerX - 75 , 70, '', {
+      font: '25px Press Start 2P',
+      fill: '#ffffff',
+      align: 'right'
+    });
+
+    this.humanSprite = this.game.add.image(0, 0, 'human');
+    this.humanSprite.scale.set(1.6);
+    this.humanSprite.alignTo(this.spotsSprite, Phaser.RIGHT_CENTER, -70, -7);
+
     this.shopSprite = this.game.add.image(this.game.width - 160, 30, 'money');
     this.shopSprite.animations.add('fly');
     this.shopSprite.scale.set(0.25);
@@ -58,25 +95,6 @@ export class Main extends Phaser.State {
     this.shopSprite.events.onInputDown.add(function () {
        this.openShop();
     }.bind(this));
-
-    this.inventorySprite = this.game.add.image(50, 35, 'car');
-    this.inventorySprite.scale.set(1);
-    this.inventorySprite.inputEnabled = true;
-    this.inventorySprite.events.onInputDown.add(function () {
-       this.openInventory();
-    }.bind(this));
-
-    this.moneyEmitter = this.game.add.emitter(this.game.world.centerX, 70, 5);
-    this.moneyEmitter.makeParticles('beer');
-    this.moneyEmitter.gravity = -200;
-    this.moneyEmitter.angle = Math.random();
-    this.moneyEmitter.minParticleScale = 0.5;
-    this.moneyEmitter.maxParticleScale = 1.2;
-    this.moneySound = this.game.add.audio('money');
-
-    this.moneySprite = this.game.add.image(this.game.world.centerX + 20, 22, 'beer');
-    this.moneySprite.scale.set(0.7);
-    this.moneySprite.alignTo(this.amountSprite, Phaser.LEFT_CENTER, 0, -5);
 
     floor.scale['setTo'](4, 4);
 
@@ -106,6 +124,7 @@ export class Main extends Phaser.State {
       this.game.world.resize(this.game.width, this.humansGroup.height + this.humansGroup.position.x + 400);
     }
     this.amountSprite.text = String(this.gameState.money);
+    this.spotsSprite.text = String(this.gameState.humans.length + '/' + this.gameState.spots);
   }
 
   monthElapsed(): void {
@@ -218,8 +237,15 @@ export class Main extends Phaser.State {
     this.openMenu(car);
 
     car.selected.attach(function (event) {
-      if (null !== human) {
+      if (null !== human && event.selected.code !== 'renault') {
         human.setEquipment(event.selected);
+        this.gameState.items.splice(this.gameState.items.indexOf(event.selected), 1);
+      }
+
+      if ('renault' === event.selected.code) {
+        philippe.say('Olivier! Oh! OLIVIER! Olivier... Putain...\n Aaaaaah', 'jimmy');
+        this.jimmySound.play();
+        this.gameState.spots += 2;
         this.gameState.items.splice(this.gameState.items.indexOf(event.selected), 1);
       }
       this.closeMenu(car);

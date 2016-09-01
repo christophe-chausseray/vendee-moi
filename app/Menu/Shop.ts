@@ -18,9 +18,9 @@ export class Shop extends View {
     new Good('coca', 1, 'Coca'),
     new Good('coffee', 2, 'Café'),
     new Good('kechup', 2, 'Kéchup'),
-    new Good('pepper', 2, 'Poivron'),
     new Good('spam', 2, 'Viande'),
-    new Tool('condom', 5, 'Capote')
+    new Tool('condom', 5, 'Capote'),
+    new Tool('renault', 100, 'R19')
   ];
   public template = _.template(`
     <h1>Superette <span>x</span></h1>

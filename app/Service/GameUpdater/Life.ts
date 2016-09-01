@@ -5,7 +5,7 @@ class Life implements GameUpdaterInterface {
   update(gameState) {
     for (var human of gameState.humans) {
       human.ages(1);
-      const factor = human.isSick() ? 40 : 80;
+      const factor = human.isSick() ? 20 : 40;
       human.setHealth(human.getHealth() - human.getAge() / (factor * 12));
     }
   }

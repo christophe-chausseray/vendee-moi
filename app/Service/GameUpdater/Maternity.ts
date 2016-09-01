@@ -12,6 +12,12 @@ class Maternity implements GameUpdaterInterface {
           }
 
           if (human.shouldGiveBirth()) {
+            if (gameState.humans.length === gameState.spots) {
+              human.giveBirth();
+              philippe.say('Tiens, la petite ' + human.getName() + ' vient de pondre. Problème: plus de place dans la Xantia. La DDAS est sur le coup, pas de problème.');
+              return;
+            }
+
             const newBorn = human.giveBirth();
             philippe.say('Tiens, ' + (newBorn.getGender() === Gender.Female ? 'la petite' : 'le petit') + ' ' + newBorn.getName() + ' vient de rejoindre cette magnifique famille');
             gameState.humans.push(newBorn);
