@@ -2,6 +2,8 @@ import * as tsEvents from 'ts-events';
 import { SyncEvent } from 'ts-events';
 import { View } from '../Menu/View';
 
+import _ = require("lodash");
+
 export class AlertView extends View {
   private message: string;
   private image: string;

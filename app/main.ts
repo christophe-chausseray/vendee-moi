@@ -7,8 +7,6 @@ import { Preload } from './State/Preload';
 import { Menu } from './State/Menu';
 import { Main } from './State/Main';
 
-declare var _: UnderscoreStatic;
-
 class Game extends Phaser.Game {
   constructor() {
     super(640, 1136, Phaser.AUTO, 'game-div', null, false, false);
